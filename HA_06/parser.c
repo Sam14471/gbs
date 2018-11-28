@@ -4,16 +4,13 @@
 
 list_t *parse (char *pfad)
 {
-	list_t *Liste = list_init();
 	list_t *Ausgabe = (list_t *) malloc(sizeof(list_t)); // warum nicht list_init?
 	bool Backslash = false;
 	bool ignore = false;				//für z.B. "     " -> " " 
 	int Dollar = 0;
 	bool EinfacheAZ = false;
 	bool DoppelteAZ = false;
-	bool exit = false;
 	bool leer = false;
-	int abbruch = 0;
 	int AnzString = 0;
 	char next;					//char der aktuell behandelt wird
 	int Pos = 0;					//Position des nächsten chars im String
@@ -21,14 +18,13 @@ list_t *parse (char *pfad)
 	char String[1024];
 	printf("$ ");
 	fgets(Eingabe, 1024, stdin);
-	sleep(1);
+	//sleep(1); //wozu?
 	for(int i = 0; i < 1024; i++)
 	{
 		next = Eingabe[i];
 		if(i == 1023 && next != '\0')
 		{
 			printf("Eingabe darf eine Länge von 1023 nicht überschreiten");
-			exit = true;
 			return Ausgabe;
 		}
 		else

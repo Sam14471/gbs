@@ -5,6 +5,7 @@
 list_t *list_init ()
 {
     list_t *Liste = (list_t *) malloc(sizeof(list_t));
+	Liste->zaehler = 0;
     return Liste;
 }
 
@@ -28,6 +29,30 @@ list_t *list_add(list_t *liste, char String[], int length)
 		liste->last = newElem;
 	}
 	//printf("Ausgabeliste->first->Elem = %s\n", liste->first->Elem);
+	liste->zaehler++;
+	return liste;
+}
+
+list_t *list_remove(list_t *liste, struct list_elem *elem) {
+	struct list_elem *before = NULL;
+	struct list_elem *search = list_first(liste);
+	while (search != elem && search != NULL) {
+		before = search;
+		search = list_elem_next(search);
+	}
+	if (search == NULL) {
+		return NULL;
+	}
+	if (search->next == NULL) {
+		liste->last = before;
+	}
+	if (before != NULL) {
+		before->next = search->next;
+	}
+	else {
+		liste->first = search->next;
+	}
+	free(search);
 	return liste;
 }
 
@@ -49,4 +74,14 @@ char *list_elem_elem(struct list_elem *Element)
 struct list_elem *list_elem_next(struct list_elem *Element)
 {
 	return Element->next;
+}
+
+char **list_to_array(list_t *liste) {
+	char **Array = (char **) malloc(sizeof(char *) * liste->zaehler + 1);
+	for (int i = 0; i < liste->zaehler; ++i) {
+		*(Array+i) = list_first(liste)->Elem;
+		list_remove(liste, list_first(liste));
+	}
+	*(Array + liste->zaehler) = NULL;
+	return Array;
 }
