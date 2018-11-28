@@ -5,7 +5,7 @@
 list_t *parse (char *pfad)
 {
 	list_t *Liste = list_init();
-	list_t *Ausgabe = (list_t *) malloc(sizeof(list_t));
+	list_t *Ausgabe = (list_t *) malloc(sizeof(list_t)); // warum nicht list_init?
 	bool Backslash = false;
 	bool ignore = false;				//für z.B. "     " -> " " 
 	int Dollar = 0;
@@ -126,7 +126,7 @@ list_t *parse (char *pfad)
 		}
 		else if(next != '\\')	//Alles Sonstige (Also auch * oder , oder : ...)
 		{
-			if(Dollar != 0)
+			if(Dollar != 0) // sollte nicht nur mit PWD, sondern auch mit anderen variablen funktionieren
 			{
 				if(Dollar == 1 && next == 'P')
 				{

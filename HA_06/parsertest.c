@@ -6,20 +6,20 @@
 int main (int argc, char *argv [], char *envp [])
 {
 	int durchlauf = 0;
-	list_t *Liste = (list_t *)malloc(sizeof(list_t));
+	list_t *Liste = (list_t *)malloc(sizeof(list_t)); // warum nicht list_init?
 	struct list_elem *current = (struct list_elem *)malloc(sizeof(struct list_elem));
 	bool ende = false;
 	bool ende2 = false;
 	char exit[4] = "exit";
 	while(!ende2)
 	{
-		Liste = parse(envp[11]);
+		Liste = parse(envp[11]); // warum nicht ganzes envp übergeben?
 		durchlauf = 1;
 		ende = false;
 		current = Liste->first;
-		for(int i = 0; i<4; i++)
+		for(int i = 0; i<4; i++) // geht auch einfacher mit strncmp()
 		{
-			if((Liste->first->Elem)[i] == exit[i])
+			if((Liste->first->Elem)[i] == exit[i]) 
 			{
 				durchlauf++;
 			}
@@ -29,7 +29,7 @@ int main (int argc, char *argv [], char *envp [])
 			ende2 = true;
 		}
 		durchlauf = 1;
-		while(!ende)
+		while(!ende) // was macht das?
 		{
 			if(current->next == NULL || current->next == current)
 			{
