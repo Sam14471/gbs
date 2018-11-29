@@ -2,17 +2,87 @@
 #include <stdio.h>
 #include "parser.h"
 
-list_t *parse (char *pfad)
+static bool Dollar = false;
+
+list_t *AusgabeVorbereitung(list_t *Ausgabe, char *String, int Pos, bool change, char *envp[])
 {
+	int dollar = 0;
+	bool gleich = false;
+	//char Ausgabestring[1023];
+	if(change)
+	{
+		for(int i = 0; i<Pos; i++)
+		{
+			if(String[i] == '$')
+			{
+				dollar = i+1;
+			}
+		}
+		for(int i = 0; i<=18; i++)			//Es gibt Befehle von envp[0] bis envp[18]
+		{
+			//printf("envp[%i]:%s", i, envp[i]);
+			for(int j = 0; j<20; j++)		//Längster Befehl ist 18 chars 
+			{
+				if(String[dollar+j] == envp[i][j])
+				{
+					gleich = true;
+				}
+				else if(envp[i][j] == '=' && gleich)
+				{
+					char Ausgabestring[1023];
+					for(int p = 0; p<dollar-1 ; p++)
+					{
+						Ausgabestring[p] = String[p];
+					}
+					for(int p = dollar-1; p<200; p++)		//p<100 hab dann auf 900 erhöht ... anderer fehler ... dann auf 200 ... trotzdem wird Value abgeschnitten
+					{
+						if(envp[i][j+p+2-dollar] == '\0'){gleich = false;}
+						if(gleich)
+						{
+							Ausgabestring[p] = envp[i][j+p+2-dollar];
+						}
+						else
+						{
+							Ausgabestring[p] = String[dollar+j];
+						}
+					}
+					Ausgabe = list_add(Ausgabe, Ausgabestring, Pos);
+					Dollar = false;
+					return Ausgabe;
+				}
+				else
+				{
+					gleich = false;
+					j = 100;
+				}
+			}
+		}
+	}
+	Ausgabe = list_add(Ausgabe, String, Pos);
+	Dollar = false;
+	return Ausgabe;
+}
+
+list_t *parse (char *envp[])
+{
+<<<<<<< HEAD
 	list_t *Ausgabe = (list_t *) malloc(sizeof(list_t)); // warum nicht list_init?
+=======
+	list_t *Ausgabe = (list_t *) malloc(sizeof(list_t));
+>>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 	bool Backslash = false;
-	bool ignore = false;				//für z.B. "     " -> " " 
-	int Dollar = 0;
+	bool ignore = false;			//für z.B. "     " -> " " 
 	bool EinfacheAZ = false;
 	bool DoppelteAZ = false;
+<<<<<<< HEAD
 	bool leer = false;
 	int AnzString = 0;
 	char next;					//char der aktuell behandelt wird
+=======
+	//bool exit = false;
+	bool leer = false;
+	char next;						//char der aktuell behandelt wird
+>>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 	int Pos = 0;					//Position des nächsten chars im String
 	char Eingabe[1024];
 	char String[1024];
@@ -25,6 +95,10 @@ list_t *parse (char *pfad)
 		if(i == 1023 && next != '\0')
 		{
 			printf("Eingabe darf eine Länge von 1023 nicht überschreiten");
+<<<<<<< HEAD
+=======
+			//exit = true;
+>>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 			return Ausgabe;
 		}
 		else
@@ -36,22 +110,16 @@ list_t *parse (char *pfad)
 				leer = true;
 				ignore = true;
 			}
-			Dollar = 0;
 		}
 		else if(next == '\n')		//DONE
 		{
 			next = '\0';
-			Dollar = 0;
 		}
 		else if(next == '$')	//DONE
 		{
 			if(!Backslash)
 			{
-				Dollar = 1;
-			}
-			else
-			{
-				Dollar = 0;
+				Dollar = true;		//wenn man "$PWD und $PWD" eingibt wird nur eines ersetzt ... int dollar statt bool übergeben ???
 			}
 		}
 		else if(next == '\'' && !Backslash)	//DONE
@@ -68,18 +136,16 @@ list_t *parse (char *pfad)
 				EinfacheAZ = true;
 				if(leer)
 				{
-					String[Pos] = '\n';
+					String[Pos] = '\n';						//\n
 					if(String[0] != '\0' && Pos != 0)
 					{
-						AnzString++;
-						Ausgabe = list_add(Ausgabe, String, Pos);
+						//AnzString++;
+						Ausgabe = AusgabeVorbereitung(Ausgabe, String, Pos, Dollar, envp);
 					}
 					Pos = 0;
-					//String[Pos] = '\n';
 				}
 				leer = false;
 			}
-			Dollar = 0;
 		}
 		else if(next == '"' && !Backslash)	//DONE
 		{
@@ -95,31 +161,28 @@ list_t *parse (char *pfad)
 				DoppelteAZ = true;
 				if(leer)
 				{
-					String[Pos] = '\n';
+					String[Pos] = '\n';				//\n
 					if(String[0] != '\0' && Pos != 0)
 					{
-						AnzString++;
-						Ausgabe = list_add(Ausgabe, String, Pos);
+						Ausgabe = AusgabeVorbereitung(Ausgabe, String, Pos, Dollar, envp);
 					}
 					Pos = 0;
 				}
 			}
 			leer = false;
-			Dollar = 0;
 		}
 		else if(leer)
 		{
 			String[Pos] = '\n';
-			if(String[Pos] != '\0' && Pos != 0)
+			if(String[0] != '\0' && Pos != 0)	//String[Pos]  ???
 			{
-				AnzString++;
-				Ausgabe = list_add(Ausgabe, String, Pos);
+				Ausgabe = AusgabeVorbereitung(Ausgabe, String, Pos, Dollar, envp);
 			}
-			//String[Pos] = '\n';
 			Pos = 0;
 			leer = false;
 			ignore = false;
 		}
+<<<<<<< HEAD
 		else if(next != '\\')	//Alles Sonstige (Also auch * oder , oder : ...)
 		{
 			if(Dollar != 0) // sollte nicht nur mit PWD, sondern auch mit anderen variablen funktionieren
@@ -156,6 +219,11 @@ list_t *parse (char *pfad)
 				}
 			}
 		}
+=======
+		
+		//**********************************//
+		
+>>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 		if(next == '\\')	//DONE
 		{
 			if(!Backslash)
@@ -165,38 +233,46 @@ list_t *parse (char *pfad)
 			}
 			else
 			{
+				//ignore = true;
 				Backslash = false;
 			}
-			Dollar = 0;
 		}
 		else	//DONE
 		{
 			Backslash = false;
 		}
 
+
 		if(next == '\n')	//Ein String Komplett
 		{
+			if(Pos == 0 && Eingabe[i-1] == '\\')		/*als Einagbe nur \*/
+			{
+				String[Pos] = '\\';
+				Pos++;
+			}
 			String[Pos] = '\0';
-			AnzString++;
-			//printf("%i:%s\n",AnzString, String);
-			Ausgabe = list_add(Ausgabe, String, Pos);
+			Ausgabe = AusgabeVorbereitung(Ausgabe, String, Pos, Dollar, envp);
 			Pos = 0;
 		}
 		else if(next == '\0')	//Eingabe Komplett
 		{
-			i = 1024;
+			if(Pos == 0 && Eingabe[i-1] == '\\')		/*als Eingabe nur \*/
+			{
+				String[Pos] = '\\';
+				Pos++;
+			}
 			String[Pos] = '\0';
-			AnzString++;
-			//printf("%i:%s\n",AnzString,  String);
-			Ausgabe = list_add(Ausgabe, String, Pos);
+			return AusgabeVorbereitung(Ausgabe, String, Pos, Dollar, envp);
 		}
 		else if(!ignore)
 		{
 			String[Pos] = next;
 			Pos++;
 		}
+		
 		ignore = false;
 		}
 	}
+	
 	return Ausgabe;
 }

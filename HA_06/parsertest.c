@@ -5,6 +5,7 @@
 
 int main (int argc, char *argv [], char *envp [])
 {
+	//printf("%s\n", envp[18]);
 	int durchlauf = 0;
 	list_t *Liste = (list_t *)malloc(sizeof(list_t)); // warum nicht list_init?
 	struct list_elem *current = (struct list_elem *)malloc(sizeof(struct list_elem));
@@ -13,7 +14,11 @@ int main (int argc, char *argv [], char *envp [])
 	char exit[4] = "exit";
 	while(!ende2)
 	{
+<<<<<<< HEAD
 		Liste = parse(envp[11]); // warum nicht ganzes envp übergeben?
+=======
+		Liste = parse(envp);
+>>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 		durchlauf = 1;
 		ende = false;
 		current = Liste->first;
@@ -36,6 +41,7 @@ int main (int argc, char *argv [], char *envp [])
 				ende = true;
 			}
 			printf("%i:%s\n", durchlauf, current->Elem);
+			//sleep(1);
 			current = current->next;
 			durchlauf++;
 		}
