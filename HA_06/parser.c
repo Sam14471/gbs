@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.h"
+#include <string.h>
 
 static bool Dollar = false;
 
@@ -21,7 +22,7 @@ list_t *AusgabeVorbereitung(list_t *Ausgabe, char *String, int Pos, bool change,
 		for(int i = 0; i<=18; i++)			//Es gibt Befehle von envp[0] bis envp[18]
 		{
 			//printf("envp[%i]:%s", i, envp[i]);
-			for(int j = 0; j<20; j++)		//Längster Befehl ist 18 chars 
+			for(int j = 0; j < 20; j++)		//Längster Befehl ist 18 chars 
 			{
 				if(String[dollar+j] == envp[i][j])
 				{
@@ -30,13 +31,17 @@ list_t *AusgabeVorbereitung(list_t *Ausgabe, char *String, int Pos, bool change,
 				else if(envp[i][j] == '=' && gleich)
 				{
 					char Ausgabestring[1023];
-					for(int p = 0; p<dollar-1 ; p++)
+					int p = 0;
+					for(; p<dollar-1 ; p++)
 					{
 						Ausgabestring[p] = String[p];
 					}
-					for(int p = dollar-1; p<200; p++)		//p<100 hab dann auf 900 erhöht ... anderer fehler ... dann auf 200 ... trotzdem wird Value abgeschnitten
+					int help = 0;
+					for(p = dollar-1; p<200; p++)		//p<100 hab dann auf 900 erhöht ... anderer fehler ... dann auf 200 ... trotzdem wird Value abgeschnitten
 					{
-						if(envp[i][j+p+2-dollar] == '\0'){gleich = false;}
+						if(envp[i][j+p+2-dollar] == '\0'){	
+							gleich = false;
+						}
 						if(gleich)
 						{
 							Ausgabestring[p] = envp[i][j+p+2-dollar];
@@ -45,8 +50,12 @@ list_t *AusgabeVorbereitung(list_t *Ausgabe, char *String, int Pos, bool change,
 						{
 							Ausgabestring[p] = String[dollar+j];
 						}
+						help = p;
+						if (Ausgabestring[p] == '\0') {
+							p = 200;
+						}
 					}
-					Ausgabe = list_add(Ausgabe, Ausgabestring, Pos);
+					Ausgabe = list_add(Ausgabe, Ausgabestring, help); // help muss lange des strings genau abbilden
 					Dollar = false;
 					return Ausgabe;
 				}
@@ -57,6 +66,9 @@ list_t *AusgabeVorbereitung(list_t *Ausgabe, char *String, int Pos, bool change,
 				}
 			}
 		}
+		// fall, dass hinter dem dollarzeichen nichts steht, bzw nichts gefunden wird
+		
+
 	}
 	Ausgabe = list_add(Ausgabe, String, Pos);
 	Dollar = false;
@@ -65,24 +77,14 @@ list_t *AusgabeVorbereitung(list_t *Ausgabe, char *String, int Pos, bool change,
 
 list_t *parse (char *envp[])
 {
-<<<<<<< HEAD
-	list_t *Ausgabe = (list_t *) malloc(sizeof(list_t)); // warum nicht list_init?
-=======
 	list_t *Ausgabe = (list_t *) malloc(sizeof(list_t));
->>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 	bool Backslash = false;
 	bool ignore = false;			//für z.B. "     " -> " " 
 	bool EinfacheAZ = false;
 	bool DoppelteAZ = false;
-<<<<<<< HEAD
-	bool leer = false;
-	int AnzString = 0;
-	char next;					//char der aktuell behandelt wird
-=======
 	//bool exit = false;
 	bool leer = false;
 	char next;						//char der aktuell behandelt wird
->>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 	int Pos = 0;					//Position des nächsten chars im String
 	char Eingabe[1024];
 	char String[1024];
@@ -95,10 +97,7 @@ list_t *parse (char *envp[])
 		if(i == 1023 && next != '\0')
 		{
 			printf("Eingabe darf eine Länge von 1023 nicht überschreiten");
-<<<<<<< HEAD
-=======
 			//exit = true;
->>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 			return Ausgabe;
 		}
 		else
@@ -182,48 +181,9 @@ list_t *parse (char *envp[])
 			leer = false;
 			ignore = false;
 		}
-<<<<<<< HEAD
-		else if(next != '\\')	//Alles Sonstige (Also auch * oder , oder : ...)
-		{
-			if(Dollar != 0) // sollte nicht nur mit PWD, sondern auch mit anderen variablen funktionieren
-			{
-				if(Dollar == 1 && next == 'P')
-				{
-					Dollar = 2;
-				}
-				else if(Dollar == 2 && next == 'W')
-				{
-					Dollar = 3;
-				}
-				else if(Dollar == 3 && next == 'D')
-				{
-					Dollar = 0;
-					ignore = true;		//??
-					Pos = Pos-3;
-					for(int i = 4; i<1024; i++)
-					{
-						if(pfad[i] != '\0' && Pos <= 1023)
-						{
-							String[Pos] = pfad[i];
-							Pos++;
-						}
-						else
-						{
-							i = 1024;
-						}
-					}
-				}
-				else
-				{
-					Dollar = 0;
-				}
-			}
-		}
-=======
 		
 		//**********************************//
 		
->>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 		if(next == '\\')	//DONE
 		{
 			if(!Backslash)

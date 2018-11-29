@@ -14,11 +14,7 @@ int main (int argc, char *argv [], char *envp [])
 	char exit[4] = "exit";
 	while(!ende2)
 	{
-<<<<<<< HEAD
-		Liste = parse(envp[11]); // warum nicht ganzes envp übergeben?
-=======
 		Liste = parse(envp);
->>>>>>> 4c3bf85648ab24c504bd355e8b033173f41db23c
 		durchlauf = 1;
 		ende = false;
 		current = Liste->first;
