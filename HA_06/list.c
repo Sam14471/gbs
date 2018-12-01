@@ -1,6 +1,7 @@
 #include "list.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 list_t *list_init ()
 {
@@ -34,8 +35,9 @@ list_t *list_add(list_t *liste, char String[], int length)
 }
 
 list_t *list_remove(list_t *liste, struct list_elem *elem) {
-	struct list_elem *before = NULL;
-	struct list_elem *search = list_first(liste);
+	struct list_elem *before = (struct list_elem*) malloc (sizeof(struct list_elem *));
+	struct list_elem *search = (struct list_elem*) malloc (sizeof(struct list_elem *));
+	search = list_first(liste);
 	while (search != elem && search != NULL) {
 		before = search;
 		search = list_elem_next(search);
@@ -53,6 +55,8 @@ list_t *list_remove(list_t *liste, struct list_elem *elem) {
 		liste->first = search->next;
 	}
 	free(search);
+	free(before);
+	liste->zaehler--;
 	return liste;
 }
 
@@ -77,11 +81,13 @@ struct list_elem *list_elem_next(struct list_elem *Element)
 }
 
 char **list_to_array(list_t *liste) {
-	char **Array = (char **) malloc(sizeof(char *) * liste->zaehler + 1);
+	char **Array = (char **) malloc(sizeof(char *) * (liste->zaehler + 1));
 	for (int i = 0; i < liste->zaehler; ++i) {
-		*(Array+i) = list_first(liste)->Elem;
+		char help[strlen(list_first(liste)->Elem)];
+		strcpy(help, list_first(liste)->Elem);
+		Array[i] = help;
 		list_remove(liste, list_first(liste));
+		Array[i+1] = NULL;
 	}
-	*(Array + liste->zaehler) = NULL;
 	return Array;
 }
